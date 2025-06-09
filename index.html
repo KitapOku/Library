@@ -50,6 +50,27 @@
       `;
 
       container.appendChild(card);
+
+      <section id="borrow-form-container" class="mt-10" style="display:none;">
+  <h2 class="text-xl font-semibold mb-4">Buch ausleihen</h2>
+  <form id="borrow-form" action="https://forms.gle/oLq6HuLgx8VenBeF7" method="POST" target="_blank" class="bg-white p-6 rounded-xl shadow space-y-4">
+    <!-- Hier die entry-ID für das Buchfeld einfügen -->
+    <input type="hidden" name="entry.000000" id="selected-book" value="" />
+    <input name="entry.123456" type="text" placeholder="Name" required class="w-full p-2 border rounded" />
+    <input name="entry.234567" type="tel" placeholder="Mobilnummer" required class="w-full p-2 border rounded" />
+    <input name="entry.345678" type="text" placeholder="Moschee / Gemeinde" required class="w-full p-2 border rounded" />
+    <select name="entry.456789" required class="w-full p-2 border rounded">
+      <option value="">Zeitraum auswählen</option>
+      <option>2 Wochen</option>
+      <option>3 Wochen</option>
+      <option>4 Wochen</option>
+      <option>Eigene Anzahl an Wochen (bitte im Kommentar angeben)</option>
+    </select>
+    <p class="text-sm text-gray-600">📌 Hinweis: Verlängerungen sind möglich – bitte das Buch erneut anfragen.</p>
+    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Anfrage senden</button>
+  </form>
+</section>
+
     });
   }
 
@@ -113,5 +134,16 @@
   <script>
     AOS.init();
   </script>
+  <script>
+  function showFormForBook(bookTitle) {
+    const formContainer = document.getElementById("borrow-form-container");
+    const bookInput = document.getElementById("selected-book");
+    
+    bookInput.value = bookTitle;
+    formContainer.style.display = "block";
+    formContainer.scrollIntoView({ behavior: "smooth" });
+  }
+</script>
+
 </body>
 </html>
