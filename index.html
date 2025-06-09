@@ -11,6 +11,52 @@
       font-family: 'Arial', sans-serif;
     }
   </style>
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
+  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBBGhn-V58ufgbSGsoL6lLONX09QJKm2sE",
+    authDomain: "bibliothek-38373.firebaseapp.com",
+    projectId: "bibliothek-38373",
+    storageBucket: "bibliothek-38373.firebasestorage.app",
+    messagingSenderId: "188405615349",
+    appId: "1:188405615349:web:715db2a75ea95cc0c6d3bc",
+    measurementId: "G-NR98T0L5RW"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  async function loadBooks() {
+    const container = document.getElementById("books-container");
+    container.innerHTML = ""; // clear old content
+
+    const querySnapshot = await getDocs(collection(db, "books"));
+    querySnapshot.forEach(docSnap => {
+      const book = docSnap.data();
+
+      // Buchkarte als HTML
+      const card = document.createElement("div");
+      card.className = "bg-white p-4 rounded-xl shadow hover:shadow-md transition";
+
+      card.innerHTML = `
+        <img src="${book.cover || 'https://via.placeholder.com/150x220?text=Kein+Cover'}" alt="Buchcover" class="rounded mb-2 w-full h-auto max-h-56 object-cover" />
+        <h3 class="text-lg font-bold">${book.title}</h3>
+        <p class="text-sm">Autor: ${book.author}</p>
+        <span class="inline-block mt-2 px-2 py-1 text-xs ${book.available ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'} rounded">
+          ${book.available ? 'Verfügbar' : 'Nicht verfügbar'}
+        </span>
+      `;
+
+      container.appendChild(card);
+    });
+  }
+
+  window.addEventListener("load", () => {
+    loadBooks();
+  });
+</script>
 </head>
 <body class="bg-gray-100 text-gray-900">
   <header class="bg-white shadow p-4 flex justify-between items-center">
@@ -26,16 +72,10 @@
   <main class="p-6">
     <section data-aos="fade-up">
       <h2 class="text-xl font-semibold mb-4">Verfügbare Bücher</h2>
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        <!-- Buchkarte -->
-        <div class="bg-white p-4 rounded-xl shadow hover:shadow-md transition">
-          <img src="https://via.placeholder.com/150x220?text=Buchcover" alt="Buchcover" class="rounded mb-2">
-          <h3 class="text-lg font-bold">Sabir: her nasip vaktine esirdir</h3>
-          <p class="text-sm">Autor: Sadettin Tuncay</p>
-          <span class="inline-block mt-2 px-2 py-1 text-xs bg-green-200 text-green-800 rounded">Verfügbar</span>
-        </div>
-        <!-- Weitere Bücher hier einfügen -->
-      </div>
+     <div id="books-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+  <!-- Dynamisch geladene Bücher kommen hier rein -->
+</div>
+
     </section>
 
     <section data-aos="fade-up" class="mt-10">
