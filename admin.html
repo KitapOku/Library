@@ -96,6 +96,24 @@
           alert("Login fehlgeschlagen: " + error.message);
         }
       });
+      
+window.updateAvailableFrom = async function(bookId) {
+  const dateInput = document.getElementById(`date-${bookId}`);
+  const newDate = dateInput.value;
+  if (!newDate) {
+    alert("Bitte ein gültiges Datum auswählen.");
+    return;
+  }
+
+  try {
+    const bookRef = doc(db, "books", bookId);
+    await setDoc(bookRef, { availableFrom: newDate }, { merge: true });
+    alert("Datum erfolgreich aktualisiert.");
+    loadBooks();
+  } catch (error) {
+    alert("Fehler beim Aktualisieren des Datums: " + error.message);
+  }
+};
 
       // Auth-Status prüfen
       onAuthStateChanged(auth, user => {
@@ -120,17 +138,23 @@
             booksContainer.innerHTML = "<p>Keine Bücher gefunden.</p>";
             return;
           }
-          snap.forEach(d => {
-            const data = d.data();
-            booksContainer.innerHTML += `
-              <div>
-                <strong>${data.title}</strong> (${data.available ? "✓ Verfügbar" : "✗ Nicht verfügbar"})<br/>
-                Autor: ${data.author || "-"}<br/>
-                Verfügbar ab: ${data.availableFrom || "-"}<br/>
-                <img src="${data.cover || ''}" alt="Cover ${data.title}" style="max-width:100px; margin-top:5px;"/>
-              </div>
-            `;
-          });
+         snap.forEach(d => {
+  const data = d.data();
+  booksContainer.innerHTML += `
+    <div>
+      <strong>${data.title}</strong> (${data.available ? "✓ Verfügbar" : "✗ Nicht verfügbar"})<br/>
+      Autor: ${data.author || "-"}<br/>
+      Verfügbar ab: ${data.availableFrom || "-"}<br/>
+      <img src="${data.cover || ''}" alt="Cover ${data.title}" style="max-width:100px; margin-top:5px;"/>
+
+      <br/><label>Verfügbar ab ändern:
+      <input type="date" value="${data.availableFrom || ''}" id="date-${d.id}" />
+      <button onclick="updateAvailableFrom('${d.id}')">Datum aktualisieren</button>
+      </label>
+    </div>
+  `;
+});
+
         } catch(e) {
           booksContainer.innerHTML = "<p>Fehler beim Laden der Bücher.</p>";
           console.error(e);
