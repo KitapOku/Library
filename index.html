@@ -31,23 +31,25 @@
       </div>
     </section>
 
-    <section data-aos="fade-up" class="mt-10">
-      <h2 class="text-xl font-semibold mb-4">Buch ausleihen</h2>
-      <form action="https://docs.google.com/forms/d/e/https://forms.gle/J1wRJvN5Ez8rVNDX8/formResponse" method="POST" target="_blank"
-        <input name="entry.123456" type="text" placeholder="Name" required class="w-full p-2 border rounded" />
-        <input name="entry.234567" type="tel" placeholder="Mobilnummer" required class="w-full p-2 border rounded" />
-        <input name="entry.345678" type="text" placeholder="Moschee / Gemeinde" required class="w-full p-2 border rounded" />
-        <select name="entry.456789" required class="w-full p-2 border rounded">
-          <option value="">Zeitraum auswählen</option>
-          <option>2 Wochen</option>
-          <option>3 Wochen</option>
-          <option>4 Wochen</option>
-          <option>Eigene Anzahl an Wochen (bitte im Kommentar angeben)</option>
-        </select>
-        <p class="text-sm text-gray-600">📌 Hinweis: Verlängerungen sind möglich – bitte das Buch erneut anfragen.</p>
-        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Anfrage senden</button>
-      </form>
-    </section>
+    <section data-aos="fade-up" class="mt-10" id="borrow-section" style="display:none">
+  <h2 class="text-xl font-semibold mb-4">Buch ausleihen</h2>
+  <form action="https://docs.google.com/forms/d/e/https://forms.gle/J1wRJvN5Ez8rVNDX8/formResponse" method="POST" target="_blank" class="space-y-4">
+    <input name="entry.0000000000" id="book-title-input" type="text" placeholder="Buchtitel" readonly required class="w-full p-2 border rounded bg-gray-100" />
+    <input name="entry.589387149" type="text" placeholder="Name" required class="w-full p-2 border rounded" />
+    <input name="entry.589387149" type="tel" placeholder="Mobilnummer" required class="w-full p-2 border rounded" />
+    <input name="entry.589387149" type="text" placeholder="Moschee / Gemeinde" required class="w-full p-2 border rounded" />
+    <select name="entry.589387149" required class="w-full p-2 border rounded">
+      <option value="">Zeitraum auswählen</option>
+      <option>2 Wochen</option>
+      <option>3 Wochen</option>
+      <option>4 Wochen</option>
+      <option>Eigene Anzahl an Wochen (bitte im Kommentar angeben)</option>
+    </select>
+    <p class="text-sm text-gray-600">📌 Hinweis: Verlängerungen sind möglich – bitte das Buch erneut anfragen.</p>
+    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Anfrage senden</button>
+  </form>
+</section>
+
 
     <section data-aos="fade-up" class="mt-10">
       <h2 class="text-xl font-semibold mb-4">Nachricht nach dem Absenden</h2>
