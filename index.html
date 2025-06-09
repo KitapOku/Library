@@ -11,77 +11,10 @@
       font-family: 'Arial', sans-serif;
     }
   </style>
-  <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
-  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyBBGhn-V58ufgbSGsoL6lLONX09QJKm2sE",
-    authDomain: "bibliothek-38373.firebaseapp.com",
-    projectId: "bibliothek-38373",
-    storageBucket: "bibliothek-38373.firebasestorage.app",
-    messagingSenderId: "188405615349",
-    appId: "1:188405615349:web:715db2a75ea95cc0c6d3bc",
-    measurementId: "G-NR98T0L5RW"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  async function loadBooks() {
-    const container = document.getElementById("books-container");
-    container.innerHTML = ""; // clear old content
-
-    const querySnapshot = await getDocs(collection(db, "books"));
-    querySnapshot.forEach(docSnap => {
-      const book = docSnap.data();
-
-      // Buchkarte als HTML
-      const card = document.createElement("div");
-      card.className = "bg-white p-4 rounded-xl shadow hover:shadow-md transition";
-
-      card.innerHTML = `
-        <img src="${book.cover || 'https://via.placeholder.com/150x220?text=Kein+Cover'}" alt="Buchcover" class="rounded mb-2 w-full h-auto max-h-56 object-cover" />
-        <h3 class="text-lg font-bold">${book.title}</h3>
-        <p class="text-sm">Autor: ${book.author}</p>
-        <span class="inline-block mt-2 px-2 py-1 text-xs ${book.available ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'} rounded">
-          ${book.available ? 'Verfügbar' : 'Nicht verfügbar'}
-        </span>
-      `;
-
-      container.appendChild(card);
-
-      <section id="borrow-form-container" class="mt-10" style="display:none;">
-  <h2 class="text-xl font-semibold mb-4">Buch ausleihen</h2>
-  <form id="borrow-form" action="https://forms.gle/oLq6HuLgx8VenBeF7" method="POST" target="_blank" class="bg-white p-6 rounded-xl shadow space-y-4">
-    <!-- Hier die entry-ID für das Buchfeld einfügen -->
-    <input type="hidden" name="entry.000000" id="selected-book" value="" />
-    <input name="entry.123456" type="text" placeholder="Name" required class="w-full p-2 border rounded" />
-    <input name="entry.234567" type="tel" placeholder="Mobilnummer" required class="w-full p-2 border rounded" />
-    <input name="entry.345678" type="text" placeholder="Moschee / Gemeinde" required class="w-full p-2 border rounded" />
-    <select name="entry.456789" required class="w-full p-2 border rounded">
-      <option value="">Zeitraum auswählen</option>
-      <option>2 Wochen</option>
-      <option>3 Wochen</option>
-      <option>4 Wochen</option>
-      <option>Eigene Anzahl an Wochen (bitte im Kommentar angeben)</option>
-    </select>
-    <p class="text-sm text-gray-600">📌 Hinweis: Verlängerungen sind möglich – bitte das Buch erneut anfragen.</p>
-    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Anfrage senden</button>
-  </form>
-</section>
-
-    });
-  }
-
-  window.addEventListener("load", () => {
-    loadBooks();
-  });
-</script>
 </head>
 <body class="bg-gray-100 text-gray-900">
   <header class="bg-white shadow p-4 flex justify-between items-center">
-    <h1 class="text-2xl font-bold">📚 Gemeindebibliothek</h1>
+    <h1 id="header-text" class="text-2xl font-bold">📚 Gemeindebibliothek</h1>
     <div class="flex items-center gap-4">
       <a href="https://www.instagram.com/ditibjugend.kreisunna/" target="_blank">
         <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram" class="h-8 w-8">
@@ -93,10 +26,9 @@
   <main class="p-6">
     <section data-aos="fade-up">
       <h2 class="text-xl font-semibold mb-4">Verfügbare Bücher</h2>
-     <div id="books-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-  <!-- Dynamisch geladene Bücher kommen hier rein -->
-</div>
-
+      <div id="books-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <!-- Dynamisch geladene Bücher -->
+      </div>
     </section>
 
     <section data-aos="fade-up" class="mt-10">
@@ -119,80 +51,85 @@
 
     <section data-aos="fade-up" class="mt-10">
       <h2 class="text-xl font-semibold mb-4">Nachricht nach dem Absenden</h2>
-      <p class="bg-green-100 p-4 rounded text-green-800">
+      <p id="thank-you-message" class="bg-green-100 p-4 rounded text-green-800 hidden">
         Vielen Dank! Deine Buchungsanfrage wurde erfolgreich übermittelt. Du wirst bald informiert, ob das Buch zur gewünschten Zeit verfügbar ist.
       </p>
-      <!-- Diese Nachricht kannst du im HTML jederzeit anpassen -->
     </section>
   </main>
 
   <footer class="bg-white p-4 mt-10 text-center text-sm text-gray-500">
-    © 2025 Gemeindebibliothek – DITIB Jugend Kreis Unna
+    <span id="footer-text">© 2025 Gemeindebibliothek – DITIB Jugend Kreis Unna</span>
   </footer>
 
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script>
     AOS.init();
   </script>
-  <script>
-  function showFormForBook(bookTitle) {
-    const formContainer = document.getElementById("borrow-form-container");
-    const bookInput = document.getElementById("selected-book");
-    
-    bookInput.value = bookTitle;
-    formContainer.style.display = "block";
-    formContainer.scrollIntoView({ behavior: "smooth" });
-  }
-</script>
-<header id="site-header" class="bg-white shadow p-4 flex justify-between items-center">
-  <h1 id="header-text" class="text-2xl font-bold">📚 Gemeindebibliothek</h1>
-  <!-- Instagram etc. -->
-</header>
-
-<footer id="site-footer" class="bg-white p-4 mt-10 text-center text-sm text-gray-500">
-  <span id="footer-text">© 2025 Gemeindebibliothek – DITIB Jugend Kreis Unna</span>
-</footer>
-<p id="thank-you-message" class="bg-green-100 p-4 rounded text-green-800" style="display:none;">
-  Vielen Dank! Deine Buchungsanfrage wurde erfolgreich übermittelt. Du wirst bald informiert, ob das Buch zur gewünschten Zeit verfügbar ist.
-</p>
 
   <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
-  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
+    import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyBBGhn-V58ufgbSGsoL6lLONX09QJKm2sE",
-    authDomain: "bibliothek-38373.firebaseapp.com",
-    projectId: "bibliothek-38373",
-    storageBucket: "bibliothek-38373.firebasestorage.app",
-    messagingSenderId: "188405615349",
-    appId: "1:188405615349:web:715db2a75ea95cc0c6d3bc",
-    measurementId: "G-NR98T0L5RW"
-  };
+    const firebaseConfig = {
+      apiKey: "AIzaSyBBGhn-V58ufgbSGsoL6lLONX09QJKm2sE",
+      authDomain: "bibliothek-38373.firebaseapp.com",
+      projectId: "bibliothek-38373",
+      storageBucket: "bibliothek-38373.firebasestorage.app",
+      messagingSenderId: "188405615349",
+      appId: "1:188405615349:web:715db2a75ea95cc0c6d3bc",
+      measurementId: "G-NR98T0L5RW"
+    };
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-  async function loadSiteTexts() {
-    const docRef = doc(db, "settings", "siteContent");
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      const data = docSnap.data();
-      document.getElementById("header-text").textContent = data.headerText || "📚 Gemeindebibliothek";
-      document.getElementById("footer-text").textContent = data.footerText || "© 2025 Gemeindebibliothek – DITIB Jugend Kreis Unna";
-      document.getElementById("thank-you-message").textContent = data.thankYouMessage || "Vielen Dank! Deine Buchungsanfrage wurde erfolgreich übermittelt. Du wirst bald informiert, ob das Buch zur gewünschten Zeit verfügbar ist.";
+    async function loadBooks() {
+      const container = document.getElementById("books-container");
+      container.innerHTML = "";
+
+      const querySnapshot = await getDocs(collection(db, "books"));
+      querySnapshot.forEach(docSnap => {
+        const book = docSnap.data();
+        const card = document.createElement("div");
+        card.className = "bg-white p-4 rounded-xl shadow hover:shadow-md transition";
+        card.innerHTML = `
+          <img src="${book.cover || 'https://via.placeholder.com/150x220?text=Kein+Cover'}" alt="Buchcover" class="rounded mb-2 w-full h-auto max-h-56 object-cover" />
+          <h3 class="text-lg font-bold">${book.title}</h3>
+          <p class="text-sm">Autor: ${book.author}</p>
+          <span class="inline-block mt-2 px-2 py-1 text-xs ${book.available ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'} rounded">
+            ${book.available ? 'Verfügbar' : 'Nicht verfügbar'}
+          </span>
+        `;
+        container.appendChild(card);
+      });
     }
-  }
 
-  function showThankYouMessageIfNeeded() {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("success") === "1") {
-      document.getElementById("thank-you-message").style.display = "block";
+    async function loadSiteTexts() {
+      const docRef = doc(db, "settings", "siteContent");
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        document.getElementById("header-text").textContent = data.headerText || "📚 Gemeindebibliothek";
+        document.getElementById("footer-text").textContent = data.footerText || "© 2025 Gemeindebibliothek – DITIB Jugend Kreis Unna";
+        document.getElementById("thank-you-message").textContent = data.thankYouMessage || "Vielen Dank! Deine Buchungsanfrage wurde erfolgreich übermittelt. Du wirst bald informiert, ob das Buch zur gewünschten Zeit verfügbar ist.";
+      }
     }
-  }
 
-  loadSiteTexts();
-  show
+    function showThankYouMessageIfNeeded() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("success") === "1") {
+        document.getElementById("thank-you-message").classList.remove("hidden");
+        document.getElementById("thank-you-message").scrollIntoView({ behavior: "smooth" });
+      }
+    }
 
+    // Initiale Ausführung
+    window.addEventListener("load", () => {
+      loadBooks();
+      loadSiteTexts();
+      showThankYouMessageIfNeeded();
+    });
+  </script>
 </body>
 </html>
+
