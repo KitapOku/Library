@@ -1,178 +1,84 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Bibliothek Admin Panel</title>
-<style>
-  body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 1rem; background: white; color: black;}
-  #admin-panel { display: none; }
-  input, button, label { display: block; width: 100%; margin-bottom: 0.5rem; }
-  hr { margin: 1rem 0; }
-</style>
-</head>
-<body>
-  <h1>📚 Admin Panel – Bibliothek</h1>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
+import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
 
-  <form id="login-form">
-    <h2>🔐 Login</h2>
-    <input type="email" name="email" placeholder="E-Mail" required />
-    <input type="password" name="password" placeholder="Passwort" required />
-    <button type="submit">Anmelden</button>
-  </form>
+const firebaseConfig = { /* deine Config hier */ };
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-  <div id="admin-panel">
-    <h2>➕ Neues Buch hinzufügen</h2>
-    <form id="book-form">
-      <input name="title" placeholder="Titel" required />
-      <input name="author" placeholder="Autor" required />
-      <input name="cover" placeholder="Cover Bild URL" required />
-      <label><input type="checkbox" name="available" checked /> Verfügbar</label>
-      <input name="availableFrom" type="date" placeholder="Verfügbar ab" />
-      <button type="submit">Speichern</button>
-    </form>
+document.addEventListener("DOMContentLoaded", () => {
+  // DOM-Elemente Auswahl
+  const loginForm = document.getElementById("login-form");
+  const adminPanel = document.getElementById("admin-panel");
+  const bookForm = document.getElementById("book-form");
+  const booksContainer = document.getElementById("books");
+  const settingsForm = document.getElementById("settings-form");
+  const settingsDocRef = doc(db, "settings", "siteContent");
 
-    <h2>📚 Alle Bücher</h2>
-    <div id="books"></div>
-
-    <h2>📝 Website Texte & Symbole bearbeiten</h2>
-<form id="settings-form">
-  <label>Nachricht nach Absenden</label>
-  <textarea name="thankYouMessage" rows="3" required></textarea>
-
-  <label>Header Text</label>
-  <input name="headerText" type="text" />
-
-  <label>Footer Text</label>
-  <input name="footerText" type="text" />
-
-  <button type="submit">Speichern</button>
-</form>
-
-  </div>
-
-  <script type="module">
-    import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
-
-const settingsDocRef = doc(db, "settings", "siteContent");
-
-const settingsForm = document.getElementById("settings-form");
-
-async function loadSettings() {
-  const docSnap = await getDoc(settingsDocRef);
-  if (docSnap.exists()) {
-    const data = docSnap.data();
-    settingsForm.thankYouMessage.value = data.thankYouMessage || "";
-    settingsForm.headerText.value = data.headerText || "";
-    settingsForm.footerText.value = data.footerText || "";
-  }
-}
-
-settingsForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  await setDoc(settingsDocRef, {
-    thankYouMessage: settingsForm.thankYouMessage.value,
-    headerText: settingsForm.headerText.value,
-    footerText: settingsForm.footerText.value,
+  // Login-Submit
+  loginForm.addEventListener("submit", async e => {
+    e.preventDefault();
+    await signInWithEmailAndPassword(auth, loginForm.email.value, loginForm.password.value);
   });
-  alert("Einstellungen gespeichert");
-});
 
-loadSettings();
-
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
-  import { getFirestore, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
-
-  document.addEventListener("DOMContentLoaded", () => {
-    try {
-      const firebaseConfig = {
-        apiKey: "AIzaSyBBGhn-V58ufgbSGsoL6lLONX09QJKm2sE",
-        authDomain: "bibliothek-38373.firebaseapp.com",
-        projectId: "bibliothek-38373",
-        storageBucket: "bibliothek-38373.firebasestorage.app",
-        messagingSenderId: "188405615349",
-        appId: "1:188405615349:web:715db2a75ea95cc0c6d3bc",
-        measurementId: "G-NR98T0L5RW"
-      };
-
-      const app = initializeApp(firebaseConfig);
-      const auth = getAuth(app);
-      const db = getFirestore(app);
-
-      const loginForm = document.getElementById("login-form");
-      const adminPanel = document.getElementById("admin-panel");
-      const bookForm = document.getElementById("book-form");
-      const booksContainer = document.getElementById("books");
-
-      loginForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const email = loginForm.email.value;
-        const password = loginForm.password.value;
-        try {
-          await signInWithEmailAndPassword(auth, email, password);
-          loginForm.style.display = "none";
-          adminPanel.style.display = "block";
-          loadBooks();
-        } catch (err) {
-          alert("Login fehlgeschlagen: " + err.message);
-        }
-      });
-
-      async function loadBooks() {
-        booksContainer.innerHTML = "Lade Bücher...";
-        try {
-          const querySnapshot = await getDocs(collection(db, "books"));
-          booksContainer.innerHTML = "";
-          querySnapshot.forEach((docSnap) => {
-            const data = docSnap.data();
-            const div = document.createElement("div");
-            div.innerHTML = `<strong>${data.title}</strong> von ${data.author}<br>Verfügbar: ${data.available ? "Ja" : "Nein"}<br>Verfügbar ab: ${data.availableFrom || "-"}<hr>`;
-            booksContainer.appendChild(div);
-          });
-        } catch(e) {
-          booksContainer.innerHTML = "Fehler beim Laden der Bücher: " + e.message;
-        }
-      }
-
-      bookForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const title = bookForm.title.value;
-        const author = bookForm.author.value;
-        const cover = bookForm.cover.value;
-        const available = bookForm.available.checked;
-        const availableFrom = bookForm.availableFrom.value;
-
-        try {
-          await addDoc(collection(db, "books"), {
-            title,
-            author,
-            cover,
-            available,
-            availableFrom,
-            createdAt: serverTimestamp()
-          });
-          alert("Buch hinzugefügt!");
-          bookForm.reset();
-          loadBooks();
-        } catch (err) {
-          alert("Fehler beim Hinzufügen: " + err.message);
-        }
-      });
-
-      onAuthStateChanged(auth, (user) => {
-        if (user) {
-          loginForm.style.display = "none";
-          adminPanel.style.display = "block";
-          loadBooks();
-        }
-      });
-    } catch (error) {
-      document.body.innerHTML = "<h2>Fehler im Script: " + error.message + "</h2>";
+  // Auth-State und Daten laden
+  onAuthStateChanged(auth, user => {
+    if (user) {
+      loginForm.style.display = "none";
+      adminPanel.style.display = "block";
+      loadBooks();
+      loadSettings();
     }
   });
-  </script>
-</body>
-</html>
+
+  // Bücher laden
+  async function loadBooks() {
+    booksContainer.innerHTML = "Lade Bücher...";
+    const snap = await getDocs(collection(db, "books"));
+    booksContainer.innerHTML = "";
+    snap.forEach(d => {
+      const data = d.data();
+      booksContainer.innerHTML += `<div><strong>${data.title}</strong> (${data.available ? "✓" : "✗"})</div>`;
+    });
+  }
+
+  // Buch-Form-Submit
+  bookForm.addEventListener("submit", async e => {
+    e.preventDefault();
+    await addDoc(collection(db, "books"), {
+      title: bookForm.title.value,
+      author: bookForm.author.value,
+      cover: bookForm.cover.value,
+      available: bookForm.available.checked,
+      availableFrom: bookForm.availableFrom.value,
+      createdAt: serverTimestamp()
+    });
+    bookForm.reset();
+    loadBooks();
+  });
+
+  // Settings laden/speichern
+  async function loadSettings() {
+    const snap = await getDoc(settingsDocRef);
+    if (snap.exists()) {
+      const data = snap.data();
+      settingsForm.thankYouMessage.value = data.thankYouMessage || "";
+      settingsForm.headerText.value = data.headerText || "";
+      settingsForm.footerText.value = data.footerText || "";
+    }
+  }
+  settingsForm.addEventListener("submit", async e => {
+    e.preventDefault();
+    await setDoc(settingsDocRef, {
+      thankYouMessage: settingsForm.thankYouMessage.value,
+      headerText: settingsForm.headerText.value,
+      footerText: settingsForm.footerText.value
+    });
+    alert("Einstellungen gespeichert");
+  });
+});
+</script>
 
 
