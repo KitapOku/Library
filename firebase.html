@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Bibliothek - Verfügbare Bücher</title>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBBGhn-V58ufgbSGsoL6lLONX09QJKm2sE",
+      authDomain: "bibliothek-38373.firebaseapp.com",
+      projectId: "bibliothek-38373",
+      storageBucket: "bibliothek-38373.firebasestorage.app",
+      messagingSenderId: "188405615349",
+      appId: "1:188405615349:web:715db2a75ea95cc0c6d3bc",
+      measurementId: "G-NR98T0L5RW"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function loadBooks() {
+      const booksContainer = document.getElementById("books");
+      booksContainer.innerHTML = "Lade Bücher...";
+
+      const querySnapshot = await getDocs(collection(db, "books"));
+      booksContainer.innerHTML = "";
+
+      querySnapshot.forEach((doc) => {
+        const book = doc.data();
+        const div = document.createElement("div");
+        div.innerHTML = `
+          <h3>${book.title}</h3>
+          <p>Autor: ${book.author}</p>
+          <p>Verfügbar: ${book.available ? "Ja" : "Nein"}</p>
+          <img src="${book.cover}" alt="Cover von ${book.title}" style="max-width:150px" />
+          <hr />
+        `;
+        booksContainer.appendChild(div);
+      });
+    }
+
+    window.onload = loadBooks;
+  </script>
+</head>
+<body>
+  <h1>Gemeindebibliothek - Verfügbare Bücher</h1>
+  <div id="books"></div>
+</body>
+</html>
