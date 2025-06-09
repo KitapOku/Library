@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bibliothek Admin Panel</title>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, getDocs, updateDoc, doc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBBGhn-V58ufgbSGsoL6lLONX09QJKm2sE",
+      authDomain: "bibliothek-38373.firebaseapp.com",
+      projectId: "bibliothek-38373",
+      storageBucket: "bibliothek-38373.firebasestorage.app",
+      messagingSenderId: "188405615349",
+      appId: "1:188405615349:web:715db2a75ea95cc0c6d3bc",
+      measurementId: "G-NR98T0L5RW"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const loginForm = document.getElementById("login-form");
+    const adminPanel = document.getElementById("admin-panel");
+    const bookForm = document.getElementById("book-form");
+    const booksContainer = document.getElementById("books");
+
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = loginForm.email.value;
+      const password = loginForm.password.value;
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        loginForm.style.display = "none";
+        adminPanel.style.display = "block";
+        loadBooks();
+      } catch (err) {
+        alert("Login fehlgeschlagen: " + err.message);
+      }
+    });
+
+    async function loadBooks() {
+      booksContainer.innerHTML = "";
+      const querySnapshot = await getDocs(collection(db, "books"));
+      querySnapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        const div = document.createElement("div");
+        div.innerHTML = `<strong>${data.title}</strong> von ${data.author}<br>Verfügbar: ${data.available ? "Ja" : "Nein"}<br>Verfügbar ab: ${data.availableFrom || "-"}<hr>`;
+        booksContainer.appendChild(div);
+      });
+    }
+
+    bookForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const title = bookForm.title.value;
+      const author = bookForm.author.value;
+      const cover = bookForm.cover.value;
+      const available = bookForm.available.checked;
+      const availableFrom = bookForm.availableFrom.value;
+
+      try {
+        await addDoc(collection(db, "books"), {
+          title,
+          author,
+          cover,
+          available,
+          availableFrom,
+          createdAt: serverTimestamp()
+        });
+        alert("Buch hinzugefügt!");
+        bookForm.reset();
+        loadBooks();
+      } catch (err) {
+        alert("Fehler beim Hinzufügen: " + err.message);
+      }
+    });
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        loginForm.style.display = "none";
+        adminPanel.style.display = "block";
+        loadBooks();
+      }
+    });
+  </script>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 1rem; }
+    #admin-panel { display: none; }
+    input, button, label { display: block; width: 100%; margin-bottom: 0.5rem; }
+    hr { margin: 1rem 0; }
+  </style>
+</head>
+<body>
+  <h1>📚 Admin Panel – Bibliothek</h1>
+
+  <form id="login-form">
+    <h2>🔐 Login</h2>
+    <input type="email" name="email" placeholder="E-Mail" required />
+    <input type="password" name="password" placeholder="Passwort" required />
+    <button type="submit">Anmelden</button>
+  </form>
+
+  <div id="admin-panel">
+    <h2>➕ Neues Buch hinzufügen</h2>
+    <form id="book-form">
+      <input name="title" placeholder="Titel" required />
+      <input name="author" placeholder="Autor" required />
+      <input name="cover" placeholder="Cover Bild URL" required />
+      <label><input type="checkbox" name="available" checked /> Verfügbar</label>
+      <input name="availableFrom" type="date" placeholder="Verfügbar ab" />
+      <button type="submit">Speichern</button>
+    </form>
+
+    <h2>📚 Alle Bücher</h2>
+    <div id="books"></div>
+  </div>
+</body>
+</html>
