@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gemeindebibliothek</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-900">
+  <header class="bg-white shadow p-4 flex justify-between items-center">
+    <h1 class="text-2xl font-bold">📚 Gemeindebibliothek</h1>
+    <div class="flex items-center gap-4">
+      <a href="https://www.instagram.com/ditibjugend.kreisunna/" target="_blank">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram" class="h-8 w-8">
+      </a>
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=https://www.instagram.com/ditibjugend.kreisunna/" alt="QR Code" class="h-10 w-10">
+    </div>
+  </header>
+
+  <main class="p-6">
+    <section data-aos="fade-up">
+      <h2 class="text-xl font-semibold mb-4">Verfügbare Bücher</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <!-- Buchkarte -->
+        <div class="bg-white p-4 rounded-xl shadow hover:shadow-md transition">
+          <img src="https://via.placeholder.com/150x220?text=Buchcover" alt="Buchcover" class="rounded mb-2">
+          <h3 class="text-lg font-bold">Sabir: her nasip vaktine esirdir</h3>
+          <p class="text-sm">Autor: Sadettin Tuncay</p>
+          <span class="inline-block mt-2 px-2 py-1 text-xs bg-green-200 text-green-800 rounded">Verfügbar</span>
+        </div>
+        <!-- Weitere Bücher hier einfügen -->
+      </div>
+    </section>
+
+    <section data-aos="fade-up" class="mt-10">
+      <h2 class="text-xl font-semibold mb-4">Buch ausleihen</h2>
+      <form action="https://docs.google.com/forms/d/e/DEIN_FORMULAR_ID/formResponse" method="POST" target="_blank" class="bg-white p-6 rounded-xl shadow space-y-4">
+        <input name="entry.123456" type="text" placeholder="Name" required class="w-full p-2 border rounded" />
+        <input name="entry.234567" type="tel" placeholder="Mobilnummer" required class="w-full p-2 border rounded" />
+        <input name="entry.345678" type="text" placeholder="Moschee / Gemeinde" required class="w-full p-2 border rounded" />
+        <select name="entry.456789" required class="w-full p-2 border rounded">
+          <option value="">Zeitraum auswählen</option>
+          <option>2 Wochen</option>
+          <option>3 Wochen</option>
+          <option>4 Wochen</option>
+          <option>Eigene Anzahl an Wochen (bitte im Kommentar angeben)</option>
+        </select>
+        <p class="text-sm text-gray-600">📌 Hinweis: Verlängerungen sind möglich – bitte das Buch erneut anfragen.</p>
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Anfrage senden</button>
+      </form>
+    </section>
+
+    <section data-aos="fade-up" class="mt-10">
+      <h2 class="text-xl font-semibold mb-4">Nachricht nach dem Absenden</h2>
+      <p class="bg-green-100 p-4 rounded text-green-800">
+        Vielen Dank! Deine Buchungsanfrage wurde erfolgreich übermittelt. Du wirst bald informiert, ob das Buch zur gewünschten Zeit verfügbar ist.
+      </p>
+      <!-- Diese Nachricht kannst du im HTML jederzeit anpassen -->
+    </section>
+  </main>
+
+  <footer class="bg-white p-4 mt-10 text-center text-sm text-gray-500">
+    © 2025 Gemeindebibliothek – DITIB Jugend Kreis Unna
+  </footer>
+
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    AOS.init();
+  </script>
+</body>
+</html>
