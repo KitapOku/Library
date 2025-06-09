@@ -83,26 +83,33 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    async function loadBooks() {
-      const container = document.getElementById("books-container");
-      container.innerHTML = "";
+   async function loadBooks() {
+  const container = document.getElementById("books-container");
+  container.innerHTML = "";
 
-      const querySnapshot = await getDocs(collection(db, "books"));
-      querySnapshot.forEach(docSnap => {
-        const book = docSnap.data();
-        const card = document.createElement("div");
-        card.className = "bg-white p-4 rounded-xl shadow hover:shadow-md transition";
-        card.innerHTML = `
-          <img src="${book.cover || 'https://via.placeholder.com/150x220?text=Kein+Cover'}" alt="Buchcover" class="rounded mb-2 w-full h-auto max-h-56 object-cover" />
-          <h3 class="text-lg font-bold">${book.title}</h3>
-          <p class="text-sm">Autor: ${book.author}</p>
-          <span class="inline-block mt-2 px-2 py-1 text-xs ${book.available ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'} rounded">
-            ${book.available ? 'Verfügbar' : 'Nicht verfügbar'}
-          </span>
-        `;
-        container.appendChild(card);
-      });
-    }
+  const querySnapshot = await getDocs(collection(db, "books"));
+  querySnapshot.forEach(docSnap => {
+    const book = docSnap.data();
+    const card = document.createElement("div");
+    card.className = "bg-white p-4 rounded-xl shadow hover:shadow-md transition cursor-pointer";
+    card.innerHTML = `
+      <img src="${book.cover || 'https://via.placeholder.com/150x220?text=Kein+Cover'}" alt="Buchcover" class="rounded mb-2 w-full h-auto max-h-56 object-cover" />
+      <h3 class="text-lg font-bold">${book.title}</h3>
+      <p class="text-sm">Autor: ${book.author}</p>
+      <span class="inline-block mt-2 px-2 py-1 text-xs ${book.available ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'} rounded">
+        ${book.available ? 'Verfügbar' : 'Nicht verfügbar'}
+      </span>
+    `;
+    // Formular anzeigen und Buchtitel setzen
+    card.addEventListener("click", () => {
+      document.getElementById("book-title-input").value = book.title;
+      document.getElementById("borrow-section").style.display = "block";
+      document.getElementById("borrow-section").scrollIntoView({ behavior: "smooth" });
+    });
+    container.appendChild(card);
+  });
+}
+
 
     async function loadSiteTexts() {
       const docRef = doc(db, "settings", "siteContent");
