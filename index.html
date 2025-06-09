@@ -144,6 +144,55 @@
     formContainer.scrollIntoView({ behavior: "smooth" });
   }
 </script>
+<header id="site-header" class="bg-white shadow p-4 flex justify-between items-center">
+  <h1 id="header-text" class="text-2xl font-bold">📚 Gemeindebibliothek</h1>
+  <!-- Instagram etc. -->
+</header>
+
+<footer id="site-footer" class="bg-white p-4 mt-10 text-center text-sm text-gray-500">
+  <span id="footer-text">© 2025 Gemeindebibliothek – DITIB Jugend Kreis Unna</span>
+</footer>
+<p id="thank-you-message" class="bg-green-100 p-4 rounded text-green-800" style="display:none;">
+  Vielen Dank! Deine Buchungsanfrage wurde erfolgreich übermittelt. Du wirst bald informiert, ob das Buch zur gewünschten Zeit verfügbar ist.
+</p>
+
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBBGhn-V58ufgbSGsoL6lLONX09QJKm2sE",
+    authDomain: "bibliothek-38373.firebaseapp.com",
+    projectId: "bibliothek-38373",
+    storageBucket: "bibliothek-38373.firebasestorage.app",
+    messagingSenderId: "188405615349",
+    appId: "1:188405615349:web:715db2a75ea95cc0c6d3bc",
+    measurementId: "G-NR98T0L5RW"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  async function loadSiteTexts() {
+    const docRef = doc(db, "settings", "siteContent");
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      document.getElementById("header-text").textContent = data.headerText || "📚 Gemeindebibliothek";
+      document.getElementById("footer-text").textContent = data.footerText || "© 2025 Gemeindebibliothek – DITIB Jugend Kreis Unna";
+      document.getElementById("thank-you-message").textContent = data.thankYouMessage || "Vielen Dank! Deine Buchungsanfrage wurde erfolgreich übermittelt. Du wirst bald informiert, ob das Buch zur gewünschten Zeit verfügbar ist.";
+    }
+  }
+
+  function showThankYouMessageIfNeeded() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("success") === "1") {
+      document.getElementById("thank-you-message").style.display = "block";
+    }
+  }
+
+  loadSiteTexts();
+  show
 
 </body>
 </html>
