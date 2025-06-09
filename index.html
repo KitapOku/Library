@@ -94,14 +94,16 @@
     const book = docSnap.data();
     const card = document.createElement("div");
     card.className = "bg-white p-4 rounded-xl shadow hover:shadow-md transition cursor-pointer";
-    card.innerHTML = `
-      <img src="${book.cover || 'https://via.placeholder.com/150x220?text=Kein+Cover'}" alt="Buchcover" class="rounded mb-2 w-full h-auto max-h-56 object-cover" />
-      <h3 class="text-lg font-bold">${book.title}</h3>
-      <p class="text-sm">Autor: ${book.author}</p>
-      <span class="inline-block mt-2 px-2 py-1 text-xs ${book.available ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'} rounded">
-        ${book.available ? 'Verfügbar' : 'Nicht verfügbar'}
-      </span>
-    `;
+   card.innerHTML = `
+  <img src="${book.cover || 'https://via.placeholder.com/150x220?text=Kein+Cover'}" alt="Buchcover" class="rounded mb-2 w-full h-auto max-h-56 object-cover" />
+  <h3 class="text-lg font-bold">${book.title}</h3>
+  <p class="text-sm">Autor: ${book.author}</p>
+  <p class="text-sm text-gray-700">${book.availableFrom ? 'Verfügbar ab: ' + book.availableFrom : ''}</p>
+  <span class="inline-block mt-2 px-2 py-1 text-xs ${book.available ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'} rounded">
+    ${book.available ? 'Verfügbar' : 'Nicht verfügbar'}
+  </span>
+`;
+
     // Formular anzeigen und Buchtitel setzen
     card.addEventListener("click", () => {
       document.getElementById("book-title-input").value = book.title;
