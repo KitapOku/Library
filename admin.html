@@ -210,7 +210,26 @@ document.getElementById("book-form").addEventListener("submit", async (e) => {
   form.reset();
   loadBooks();
 });
+    
+<div id="admin-panel" style="display:none;">
+  <!-- ... bestehende Elemente ... -->
+  
+  <h3>Buchstatus aktualisieren</h3>
+  <form id="status-form">
+    <select id="status-select" required>
+      <option value="available">Verfügbar</option>
+      <option value="reserved">Reserviert</option>
+      <option value="availableFrom">Verfügbar ab...</option>
+    </select>
+    
+    <div id="date-picker" style="display:none;">
+      <label>Verfügbar ab:</label>
+      <input type="date" id="available-date">
+    </div>
 
+    <button type="submit">Status speichern</button>
+  </form>
+</div>
 
 
 
