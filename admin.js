@@ -45,12 +45,12 @@ class AdminPanel {
 
       const firebaseConfig = {
         apiKey: "AIzaSyBBGhn-V58ufgbSGsoL6lLONX09QJKm2sE",
-        authDomain: "bibliothek-38373.firebaseapp.com",
-        projectId: "bibliothek-38373",
-        storageBucket: "bibliothek-38373.appspot.com",
-        messagingSenderId: "188405615349",
-        appId: "1:188405615349:web:715db2a75ea95cc0c6d3bc",
-        measurementId: "G-NR98T0L5RW"
+            authDomain: "bibliothek-38373.firebaseapp.com",
+            projectId: "bibliothek-38373",
+            storageBucket: "bibliothek-38373.appspot.com",
+            messagingSenderId: "188405615349",
+            appId: "1:188405615349:web:715db2a75ea95cc0c6d3bc",
+            measurementId: "G-NR98T0L5RW"
       };
 
       this.app = initializeApp(firebaseConfig);
