@@ -62,6 +62,44 @@
       white-space: nowrap;
       border: 0;
     }
+.books-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.5rem;
+  padding: 2rem;
+}
+
+.book-card {
+  background: white;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.book-card img {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.status {
+  display: inline-block;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+}
+
+.status.available {
+  background: #c6f6d5;
+  color: #22543d;
+}
+
+.status.unavailable {
+  background: #fed7d7;
+  color: #742a2a;
+}
+    
   </style>
 
   <!-- Progressive Web App Meta -->
@@ -90,5 +128,54 @@
     <div class="loading">Willkommen in der Gemeindebibliothek der DITIB Jugend Kreis Unna!</div>
     <!-- Weitere Inhalte hier -->
   </main>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
+  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBBGhn-V58ufgbSGsoL6lLONX09QJKm2sE",
+    authDomain: "bibliothek-38373.firebaseapp.com",
+    projectId: "bibliothek-38373",
+    storageBucket: "bibliothek-38373.appspot.com",
+    messagingSenderId: "188405615349",
+    appId: "1:188405615349:web:715db2a75ea95cc0c6d3bc",
+    measurementId: "G-NR98T0L5RW"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  async function loadBooks() {
+    const container = document.createElement("div");
+    container.className = "books-grid";
+    container.innerHTML = "<h2>Verfügbare Bücher</h2>";
+
+    try {
+      const querySnapshot = await getDocs(collection(db, "books"));
+      querySnapshot.forEach(doc => {
+        const book = doc.data();
+        const bookCard = `
+          <div class="book-card">
+            <img src="${book.cover || 'placeholder.jpg'}" alt="${book.title}">
+            <h3>${book.title}</h3>
+            <p>${book.author}</p>
+            <span class="status ${book.available ? 'available' : 'unavailable'}">
+              ${book.available ? 'Verfügbar' : 'Ausgeliehen'}
+            </span>
+          </div>
+        `;
+        container.innerHTML += bookCard;
+      });
+    } catch (error) {
+      container.innerHTML = `<p class="error">Fehler beim Laden der Bücher: ${error.message}</p>`;
+    }
+
+    document.querySelector("main").replaceChild(container, document.querySelector(".loading"));
+  }
+
+  window.addEventListener("DOMContentLoaded", loadBooks);
+</script>
+  
 </body>
 </html>
