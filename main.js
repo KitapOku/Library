@@ -105,7 +105,15 @@ class LibraryApp {
       alert(`${message}: ${error.message || error}`);
     }
   }
-  
+
+  // Beim Klick auf ein Buch
+div.addEventListener('click', () => {
+  document.getElementById('bookTitleInput').value = book.title;
+  document.getElementById('form-section').style.display = 'block'; // Formular sichtbar machen
+  document.getElementById('thankYouMsg').classList.add('hidden'); // Erfolgsmeldung verstecken
+  // Optional: Scrollen zum Formular
+  document.getElementById('form-section').scrollIntoView({behavior: 'smooth'});
+});
   // Initialisierung beim Laden der Seite
   document.addEventListener('DOMContentLoaded', () => {
     window.libraryApp = new LibraryApp();
