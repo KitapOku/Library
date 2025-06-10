@@ -1,4 +1,5 @@
-📚 Gemeindebibliothek - DITIB Jugend Kreis Unna
+I wanted to create a Website with AI for the people in my local town, where I offer books which they can borrow from the website. I share the opinion that people shall read more books! The booking automatically transfers into a google sheet. If you can help me and make this project better and more efficient, I would be very thankful :)
+📚 Gemeindebibliothek 
 Eine moderne, optimierte Web-Anwendung für die Verwaltung und Ausleihe von Büchern in der Gemeindebibliothek.
 
 ✨ Features
