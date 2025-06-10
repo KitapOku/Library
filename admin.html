@@ -6,243 +6,266 @@
   <title>Bibliothek Admin Panel - DITIB Jugend Kreis Unna</title>
   <meta name="robots" content="noindex, nofollow">
   <style>
-    * { box-sizing: border-box; }
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      max-width: 500px;
-      margin: 0 auto;
+    /* ... Behalte deine bestehenden Styles bei ... */
+    
+    /* Neue Status-Styles */
+    #status-form {
+      margin: 2rem 0;
       padding: 1rem;
-      background-color: #f5f5f5;
-      color: #333;
-      line-height: 1.6;
-    }
-    .container {
-      background: white;
-      padding: 2rem;
+      background: #f8fafc;
       border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      margin-top: 2rem;
     }
-    h1 {
-      color: #2c3e50;
-      text-align: center;
-      border-bottom: 3px solid #3498db;
-      padding-bottom: 0.5rem;
-      margin-bottom: 2rem;
-    }
-    .form-group { margin-bottom: 1rem; }
-    label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 600;
-      color: #2c3e50;
-    }
-    input {
-      width: 100%;
-      padding: 0.75rem;
-      border: 2px solid #ddd;
-      border-radius: 4px;
-      font-size: 1rem;
-      transition: border-color 0.3s ease;
-    }
-    input:focus {
-      outline: none;
-      border-color: #3498db;
-      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-    }
-    button {
-      background: #3498db;
-      color: white;
-      padding: 0.75rem 1.5rem;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 1rem;
-      transition: background 0.3s ease;
+    
+    #date-picker {
       margin-top: 1rem;
-      width: 100%;
+      display: none;
     }
-    button:hover { background: #2980b9; }
-    .error { color: #e74c3c; margin-top: 1rem; text-align: center; }
-    .success { color: #27ae60; margin-top: 1rem; text-align: center; }
-    #admin-panel { display: none; }
-    .logout-btn {
-      background: #e74c3c;
-      margin-top: 2rem;
+    
+    .status-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 1rem;
+      font-size: 0.9rem;
+      color: white;
     }
-    .logout-btn:hover { background: #c0392b; }
+    
+    .available { background: #10b981; }
+    .reserved { background: #f59e0b; }
+    .availableFrom { background: #3b82f6; }
   </style>
 </head>
 <body>
   <div class="container">
-  <h1>Bibliothek Admin Panel</h1>
-  <form id="login-form">
-    <!-- ...wie gehabt... -->
-  </form>
-  <div id="admin-panel" style="display:none;">
-    <p class="success">Login erfolgreich! Willkommen im Admin-Bereich.</p>
-    <h2>Bücher verwalten</h2>
-    <div id="books"></div>
-    <h3>Neues Buch hinzufügen</h3>
-    <form id="book-form">
-      <input type="text" name="title" placeholder="Titel" required>
-      <input type="text" name="author" placeholder="Autor">
-      <input type="text" name="cover" placeholder="Cover-URL">
-      <label>
-        <input type="checkbox" name="available"> Verfügbar
-      </label>
-      <button type="submit">Hinzufügen</button>
+    <h1>Bibliothek Admin Panel</h1>
+    <form id="login-form">
+      <div class="form-group">
+        <label for="email">E-Mail</label>
+        <input type="email" id="email" required>
+      </div>
+      <div class="form-group">
+        <label for="password">Passwort</label>
+        <input type="password" id="password" required>
+      </div>
+      <button type="submit">Login</button>
+      <div id="login-error" class="error"></div>
     </form>
-    <button class="logout-btn" id="logout-btn">Logout</button>
-  </div>
-</div>
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
 
-    // TODO: Trage hier deine Firebase-Konfiguration ein
+    <div id="admin-panel" style="display:none;">
+      <p class="success">Login erfolgreich! Willkommen im Admin-Bereich.</p>
+      
+      <h2>Bücher verwalten</h2>
+      <div id="books"></div>
+
+      <h3>Neues Buch hinzufügen</h3>
+      <form id="book-form">
+        <!-- ... bestehende Felder ... -->
+      </form>
+
+      <h3>Buchstatus aktualisieren</h3>
+      <form id="status-form">
+        <select id="status-select" required>
+          <option value="available">Verfügbar</option>
+          <option value="reserved">Reserviert</option>
+          <option value="availableFrom">Verfügbar ab...</option>
+        </select>
+        
+        <div id="date-picker">
+          <label>Verfügbar ab:</label>
+          <input type="date" id="available-date">
+        </div>
+
+        <button type="submit">Status speichern</button>
+      </form>
+
+      <button class="logout-btn" id="logout-btn">Logout</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { 
+      initializeApp 
+    } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
+    
+    import { 
+      getAuth, 
+      signInWithEmailAndPassword, 
+      onAuthStateChanged, 
+      signOut 
+    } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
+    
+    import { 
+      getFirestore,
+      collection,
+      getDocs,
+      addDoc,
+      doc,
+      deleteDoc,
+      updateDoc,
+      serverTimestamp,
+      Timestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
+
     const firebaseConfig = {
       apiKey: "AIzaSyBBGhn-V58ufgbSGsoL6lLONX09QJKm2sE",
-            authDomain: "bibliothek-38373.firebaseapp.com",
-            projectId: "bibliothek-38373",
-            storageBucket: "bibliothek-38373.appspot.com",
-            messagingSenderId: "188405615349",
-            appId: "1:188405615349:web:715db2a75ea95cc0c6d3bc",
-            measurementId: "G-NR98T0L5RW"
+      authDomain: "bibliothek-38373.firebaseapp.com",
+      projectId: "bibliothek-38373",
+      storageBucket: "bibliothek-38373.appspot.com",
+      messagingSenderId: "188405615349",
+      appId: "1:188405615349:web:715db2a75ea95cc0c6d3bc",
+      measurementId: "G-NR98T0L5RW"
     };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getFirestore(app);
 
+    // DOM-Elemente
     const loginForm = document.getElementById("login-form");
     const loginError = document.getElementById("login-error");
     const adminPanel = document.getElementById("admin-panel");
     const logoutBtn = document.getElementById("logout-btn");
+    const booksContainer = document.getElementById("books");
+    const bookForm = document.getElementById("book-form");
+    const statusForm = document.getElementById("status-form");
+    const statusSelect = document.getElementById("status-select");
+    const datePicker = document.getElementById("date-picker");
+    const availableDate = document.getElementById("available-date");
 
+    let selectedBookId = null;
+
+    // Login-Handler
     loginForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      loginError.textContent = "";
       const email = loginForm.email.value;
       const password = loginForm.password.value;
+      
       try {
         await signInWithEmailAndPassword(auth, email, password);
-        // Der Rest wird von onAuthStateChanged gehandhabt
       } catch (err) {
-        loginError.textContent = "Login fehlgeschlagen: " + (err.message || "Unbekannter Fehler");
+        loginError.textContent = `Login fehlgeschlagen: ${err.message}`;
       }
     });
 
+    // Auth State Listener
     onAuthStateChanged(auth, (user) => {
       if (user) {
         loginForm.style.display = "none";
         adminPanel.style.display = "block";
+        loadBooks();
       } else {
         loginForm.style.display = "block";
         adminPanel.style.display = "none";
       }
     });
 
-
-import { getFirestore, collection, getDocs, addDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
-
-const db = getFirestore(app);
-
-async function loadBooks() {
-  const booksContainer = document.getElementById("books");
-  booksContainer.innerHTML = "Lade Bücher...";
-  try {
-    const querySnapshot = await getDocs(collection(db, "books"));
-    if (querySnapshot.empty) {
-      booksContainer.innerHTML = "<p>Keine Bücher gefunden.</p>";
-      return;
+    // Bücher laden
+    async function loadBooks() {
+      try {
+        const querySnapshot = await getDocs(collection(db, "books"));
+        booksContainer.innerHTML = querySnapshot.docs
+          .map(doc => createBookCard(doc))
+          .join("");
+          
+        addBookEventListeners();
+      } catch (error) {
+        console.error("Fehler beim Laden:", error);
+      }
     }
-    booksContainer.innerHTML = "";
-    querySnapshot.forEach(docSnap => {
-      const book = docSnap.data();
-      const div = document.createElement("div");
-      div.innerHTML = `
-        <strong>${book.title}</strong> (${book.available ? "✓ Verfügbar" : "✗ Nicht verfügbar"})<br/>
-        Autor: ${book.author || "-"}<br/>
-        <img src="${book.cover || ''}" alt="Cover" style="max-width:80px; margin:5px 0;"><br/>
-        <button data-id="${docSnap.id}" class="delete-btn">Löschen</button>
-        <hr>
+
+    function createBookCard(doc) {
+      const book = doc.data();
+      return `
+        <div class="book-card" data-id="${doc.id}">
+          <h3>${book.title}</h3>
+          <p>${book.author}</p>
+          <div class="status-badge ${book.status || 'available'}">
+            ${getStatusText(book)}
+          </div>
+          <button class="edit-btn">Bearbeiten</button>
+          <button class="delete-btn">Löschen</button>
+        </div>
       `;
-      booksContainer.appendChild(div);
-    });
+    }
 
-    // Löschen-Buttons aktivieren
-    booksContainer.querySelectorAll(".delete-btn").forEach(btn => {
-      btn.addEventListener("click", async (e) => {
-        const id = e.target.getAttribute("data-id");
-        if (confirm("Buch wirklich löschen?")) {
-          await deleteDoc(doc(db, "books", id));
-          loadBooks();
-        }
+    function getStatusText(book) {
+      if (book.status === 'availableFrom' && book.availableFrom) {
+        const date = book.availableFrom.toDate().toLocaleDateString();
+        return `Verfügbar ab ${date}`;
+      }
+      return book.status === 'available' ? 'Verfügbar' : 'Reserviert';
+    }
+
+    // Event Listeners für Bücher
+    function addBookEventListeners() {
+      document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          selectedBookId = e.target.closest('.book-card').dataset.id;
+          statusForm.scrollIntoView({ behavior: 'smooth' });
+        });
       });
+
+      document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const id = e.target.closest('.book-card').dataset.id;
+          if (confirm("Buch wirklich löschen?")) {
+            await deleteDoc(doc(db, "books", id));
+            loadBooks();
+          }
+        });
+      });
+    }
+
+    // Status-Formular
+    statusSelect.addEventListener('change', () => {
+      datePicker.style.display = statusSelect.value === 'availableFrom' 
+        ? 'block' 
+        : 'none';
     });
-  } catch (e) {
-    booksContainer.innerHTML = "<p>Fehler beim Laden der Bücher.</p>";
-  }
-}
 
-// Nach erfolgreichem Login Bücher laden
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    loginForm.style.display = "none";
-    adminPanel.style.display = "block";
-    loadBooks();
-  } else {
-    loginForm.style.display = "block";
-    adminPanel.style.display = "none";
-  }
-});
+    statusForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const updateData = {
+        status: statusSelect.value
+      };
 
-// Buch hinzufügen
-document.getElementById("book-form").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const form = e.target;
-  await addDoc(collection(db, "books"), {
-    title: form.title.value,
-    author: form.author.value,
-    cover: form.cover.value,
-    available: form.available.checked
-  });
-  form.reset();
-  loadBooks();
-});
-    
-<div id="admin-panel" style="display:none;">
-  <!-- ... bestehende Elemente ... -->
-  
-  <h3>Buchstatus aktualisieren</h3>
-  <form id="status-form">
-    <select id="status-select" required>
-      <option value="available">Verfügbar</option>
-      <option value="reserved">Reserviert</option>
-      <option value="availableFrom">Verfügbar ab...</option>
-    </select>
-    
-    <div id="date-picker" style="display:none;">
-      <label>Verfügbar ab:</label>
-      <input type="date" id="available-date">
-    </div>
+      if (statusSelect.value === 'availableFrom') {
+        if (!availableDate.value) {
+          alert('Bitte Datum auswählen!');
+          return;
+        }
+        updateData.availableFrom = Timestamp.fromDate(
+          new Date(availableDate.value)
+        );
+      }
 
-    <button type="submit">Status speichern</button>
-  </form>
-</div>
-
-
-
-
-
-
-
-
-
-    
-    logoutBtn.addEventListener("click", async () => {
-      await signOut(auth);
+      try {
+        await updateDoc(doc(db, "books", selectedBookId), updateData);
+        loadBooks();
+        statusForm.reset();
+        datePicker.style.display = 'none';
+      } catch (error) {
+        console.error("Update fehlgeschlagen:", error);
+      }
     });
+
+    // Buch hinzufügen
+    bookForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      await addDoc(collection(db, "books"), {
+        title: bookForm.title.value,
+        author: bookForm.author.value,
+        cover: bookForm.cover.value,
+        available: bookForm.available.checked,
+        status: 'available',
+        createdAt: serverTimestamp()
+      });
+      bookForm.reset();
+      loadBooks();
+    });
+
+    // Logout
+    logoutBtn.addEventListener("click", () => signOut(auth));
   </script>
 </body>
 </html>
