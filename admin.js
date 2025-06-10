@@ -156,7 +156,52 @@ class AdminPanel {
         this.handleError('Buch konnte nicht gelöscht werden', error);
       }
     }
+
+// Status-Formular Logik
+const statusForm = document.getElementById('status-form');
+const statusSelect = document.getElementById('status-select');
+const datePicker = document.getElementById('date-picker');
+const availableDate = document.getElementById('available-date');
+
+// Datumsauswahl anzeigen/verstecken
+statusSelect.addEventListener('change', () => {
+  datePicker.style.display = statusSelect.value === 'availableFrom' 
+    ? 'block' 
+    : 'none';
+});
+
+// Buchstatus aktualisieren
+statusForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
   
+  const selectedStatus = statusSelect.value;
+  const updateData = {
+    status: selectedStatus
+  };
+
+  if (selectedStatus === 'availableFrom') {
+    if (!availableDate.value) {
+      alert('Bitte ein Datum auswählen!');
+      return;
+    }
+    updateData.availableFrom = firebase.firestore.Timestamp.fromDate(
+      new Date(availableDate.value)
+    );
+  } else {
+    updateData.availableFrom = null;
+  }
+
+  try {
+    await updateDoc(doc(db, 'books', selectedBookId), updateData);
+    loadBooks(); // Bücherliste neu laden
+    statusForm.reset();
+  } catch (error) {
+    console.error('Fehler beim Status-Update:', error);
+  }
+});
+
+
+    
     renderBooks(books) {
       // Beispiel: Bücherliste im DOM anzeigen
       const booksList = document.getElementById('booksList');
@@ -169,7 +214,48 @@ class AdminPanel {
         booksList.appendChild(li);
       });
     }
+
+function renderBooks(books) {
+  booksContainer.innerHTML = '';
   
+  books.forEach(book => {
+    const statusBadge = getStatusBadge(book);
+    const bookCard = `
+      <div class="book-card" data-id="${book.id}">
+        <h3>${book.title}</h3>
+        <p>${book.author}</p>
+        ${statusBadge}
+        <button class="edit-status">Status bearbeiten</button>
+      </div>
+    `;
+    booksContainer.innerHTML += bookCard;
+  });
+
+  // Event-Listener für Bearbeiten-Buttons
+  document.querySelectorAll('.edit-status').forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectedBookId = btn.closest('.book-card').dataset.id;
+      // Hier könntest du das Formular mit aktuellen Werten vorausfüllen
+    });
+  });
+}
+
+function getStatusBadge(book) {
+  const statusConfig = {
+    available: { text: 'Verfügbar', color: 'green' },
+    reserved: { text: 'Reserviert', color: 'orange' },
+    availableFrom: { 
+      text: `Verfügbar ab ${book.availableFrom?.toDate().toLocaleDateString()}`, 
+      color: 'blue' 
+    }
+  };
+
+  const config = statusConfig[book.status] || {};
+  return `<span class="status-badge" style="background:${config.color}">
+    ${config.text}
+  </span>`;
+}
+
     handleError(message, error) {
       console.error(message, error);
       alert(`${message}: ${error.message || error}`);
